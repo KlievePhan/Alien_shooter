@@ -8,16 +8,18 @@ public class SpawnerManager : MonoBehaviour
 {
     public float startTimeBtwSpawn;
     private float timeBtwSpawn;
-
     public GameObject[] enemies;
-
     public WeaponManager weaponManager;
-
     public List<Spawner> spawners;
-
     private Player player;
-    int maxEnemy = 5;
+
+    int maxEnemy = 3;
     int roundCount = 0;
+
+    // Giới hạn số quái tối đa trên map
+    public int maxEnemiesOnMap = 20;
+    // Giới hạn maxEnemy cao nhất
+    public int maxEnemyLimit = 15;
 
     private void Start()
     {
@@ -26,28 +28,21 @@ public class SpawnerManager : MonoBehaviour
 
     public List<int> GetRandomIndices(int n, int k)
     {
-
-        // Create a list containing all indices from 0 to n-1
         List<int> allIndices = new List<int>();
         for (int i = 0; i < n; i++)
         {
             allIndices.Add(i);
         }
 
-        // Create a list to store the randomly selected indices
         List<int> randomIndices = new List<int>();
-
-        // Use Fisher-Yates shuffle algorithm to randomly shuffle the indices
         int remainingItems = n;
         for (int i = 0; i < k; i++)
         {
             int randomIndex = UnityEngine.Random.Range(0, remainingItems);
             randomIndices.Add(allIndices[randomIndex]);
-            // Move the last index in the list to the current position
             allIndices[randomIndex] = allIndices[remainingItems - 1];
             remainingItems--;
         }
-
         return randomIndices;
     }
 
@@ -55,24 +50,44 @@ public class SpawnerManager : MonoBehaviour
     {
         if (timeBtwSpawn <= 0)
         {
-            int randEnemyCount = UnityEngine.Random.Range(2, maxEnemy);
-            if (weaponManager.Enemies.Count <= 5)
-                randEnemyCount = UnityEngine.Random.Range(maxEnemy - 2, maxEnemy);
-
-            List<int> randomIndex = GetRandomIndices(maxEnemy, randEnemyCount);
-
-            foreach(int index in randomIndex)
+            // THÊM: Chỉ spawn nếu số quái chưa đạt giới hạn
+            if (weaponManager.Enemies.Count >= maxEnemiesOnMap)
             {
-                int randEnemy = UnityEngine.Random.Range(0, enemies.Length);
-                spawners[index].spawnEnemy(enemies[randEnemy]);
+                timeBtwSpawn = startTimeBtwSpawn * 0.5f; // Kiểm tra lại sau nửa thời gian
+                return;
             }
-            timeBtwSpawn = startTimeBtwSpawn;
 
+            int randEnemyCount = UnityEngine.Random.Range(2, maxEnemy);
+
+            // SỬA: Logic spawn thêm quái
+            if (weaponManager.Enemies.Count <= 5)
+                randEnemyCount = UnityEngine.Random.Range(maxEnemy - 1, maxEnemy + 1);
+
+            // THÊM: Đảm bảo không spawn quá giới hạn
+            int spaceLeft = maxEnemiesOnMap - weaponManager.Enemies.Count;
+            randEnemyCount = Mathf.Min(randEnemyCount, spaceLeft);
+
+            // Đảm bảo randEnemyCount không vượt quá số spawner
+            randEnemyCount = Mathf.Min(randEnemyCount, spawners.Count);
+
+            if (randEnemyCount > 0)
+            {
+                List<int> randomIndex = GetRandomIndices(spawners.Count, randEnemyCount);
+                foreach (int index in randomIndex)
+                {
+                    int randEnemy = UnityEngine.Random.Range(0, enemies.Length);
+                    spawners[index].spawnEnemy(enemies[randEnemy]);
+                }
+            }
+
+            timeBtwSpawn = startTimeBtwSpawn;
             roundCount++;
+
             if (roundCount > 10)
             {
                 roundCount = 0;
-                maxEnemy = Mathf.Max(spawners.Count, maxEnemy + 1);
+                //Giới hạn maxEnemy không tăng vô hạn
+                maxEnemy = Mathf.Min(maxEnemyLimit, maxEnemy + 1);
             }
         }
         else

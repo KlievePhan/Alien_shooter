@@ -10,8 +10,8 @@ public class Weapon : MonoBehaviour
     private float timeBtwShots;
     public float startTimeBtwShots;
     public float bulletForce;
-    public int minDamage = 6;
-    public int maxDamage = 16;
+    public int minDamage = 15;
+    public int maxDamage = 30;
 
     // Effect Part 10
     public GameObject fireEffect;

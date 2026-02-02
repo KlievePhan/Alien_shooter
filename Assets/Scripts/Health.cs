@@ -25,6 +25,12 @@ public class Health : MonoBehaviour
             healthBar.UpdateHealth(currentHealth, maxHealth);
     }
 
+    public void Heal()
+    {
+        currentHealth = maxHealth;
+
+    }
+
     public void TakeDam(int damage)
     {
         if (safeTime <= 0)
@@ -38,7 +44,7 @@ public class Health : MonoBehaviour
                 {
                     FindObjectOfType<WeaponManager>().RemoveEnemyToFireRange(this.transform);
                     FindObjectOfType<Killed>().UpdateKilled();
-                    FindObjectOfType<PlayerExp>().UpdateExperience(UnityEngine.Random.Range(1, 4));
+                    FindObjectOfType<PlayerExp>().UpdateExperience(UnityEngine.Random.Range(2, 5));
                     Destroy(this.gameObject, 0.125f);
                 }
                 isDead = true;

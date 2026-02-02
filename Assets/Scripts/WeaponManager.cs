@@ -10,14 +10,22 @@ public class WeaponManager : MonoBehaviour
 
     public void AddWeapon(GameObject weaponPrefab)
     {
-        if (currentWeaponSlot < weaponSlots.Count)
-        {
-            Instantiate(weaponPrefab, weaponSlots[currentWeaponSlot]);
-            currentWeaponSlot++;
-        }
-    }
-    ///
+        if (weaponPrefab == null) return;
 
+        int slotIndex = currentWeaponSlot % weaponSlots.Count;  // wrap around nếu quá
+        Transform slot = weaponSlots[slotIndex];
+
+        if (slot == null)
+        {
+            Debug.LogError($"Slot {slotIndex} null!");
+            return;
+        }
+
+        Instantiate(weaponPrefab, slot);
+        currentWeaponSlot++;  // vẫn tăng để theo dõi
+
+        Debug.Log($"Forced spawn at slot {slotIndex}");
+    }
 
     public List<Transform> Enemies = new List<Transform>();
 

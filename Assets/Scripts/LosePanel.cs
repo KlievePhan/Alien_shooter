@@ -7,6 +7,7 @@ using UnityEngine.SceneManagement;
 public class LosePanel : MonoBehaviour
 {
     public TextMeshProUGUI score;
+    public string mainMenuSceneName = "MainMenu"; // tên scene menu
 
     private void Start()
     {
@@ -17,7 +18,7 @@ public class LosePanel : MonoBehaviour
     {
         gameObject.SetActive(true);
         int scoreI = FindObjectOfType<Killed>().currentKilled * 10;
-        score.text = "You get: " + scoreI.ToString() + " Score";
+        score.text = "You get: " + scoreI + " Score";
         Time.timeScale = 0;
     }
 
@@ -31,8 +32,24 @@ public class LosePanel : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.R))
         {
-            Time.timeScale = 1;
-            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+            RestartGame();
         }
+
+        if (Input.GetKeyDown(KeyCode.E))
+        {
+            GoToMainMenu();
+        }
+    }
+
+    void RestartGame()
+    {
+        Time.timeScale = 1;
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+    }
+
+    void GoToMainMenu()
+    {
+        Time.timeScale = 1;
+        SceneManager.LoadScene(mainMenuSceneName);
     }
 }
